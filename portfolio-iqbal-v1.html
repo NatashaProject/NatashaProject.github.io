@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammad Iqbal Alhamdani — Blue Team Defender</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: {
+        display: ['Cormorant Garamond','serif'],
+        mono: ['DM Mono','monospace'],
+        sans: ['Outfit','sans-serif'],
+      },
+      colors: {
+        navy: { 950:'#050d1a', 900:'#08111f', 800:'#0c1829', 700:'#0e1e33', 600:'#122438', 500:'#142844' },
+        gold: { DEFAULT:'#c9a94b', light:'#e4c97e', dim:'#7a6128', pale:'#f5e9c8' },
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s ease-in-out infinite',
+        'float': 'float 3s ease-in-out infinite',
+        'spin-slow': 'spin 20s linear infinite',
+        'blink': 'blink 1s step-end infinite',
+      },
+      keyframes: {
+        float: { '0%,100%':{ transform:'translateY(0)' }, '50%':{ transform:'translateY(8px)' } },
+        blink: { '0%,100%':{ opacity:'1' }, '50%':{ opacity:'0' } },
+      }
+    }
+  }
+}
+</script>
+<style>
+  /* ── Base ── */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family:'Outfit',sans-serif; font-weight:300; line-height:1.7; transition: background 0.4s, color 0.4s; overflow-x:hidden; }
+  .font-display { font-family:'Cormorant Garamond',serif; }
+  .font-mono-custom { font-family:'DM Mono',monospace; }
+
+  /* ── Dark mode ── */
+  .dark body { background:#08111f; color:#e8edf5; }
+  .light body { background:#f4f1eb; color:#1a1a1a; }
+
+  /* ── Scroll progress bar ── */
+  #progress-bar {
+    position: fixed; top:0; left:0; height:2px; width:0%;
+    background: linear-gradient(90deg, #c9a94b, #e4c97e);
+    z-index:9999; transition: width 0.1s linear;
+  }
+
+
+
+  /* ── Noise overlay ── */
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:1; opacity:0.4;
+  }
+
+  /* ── Loading Screen ── */
+  #loader {
+    position:fixed; inset:0; z-index:10000;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:#050d1a;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #loader.hide { opacity:0; visibility:hidden; }
+  .loader-window {
+    width: min(560px, 90vw);
+    border:1px solid rgba(201,169,75,0.2);
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:0 0 60px rgba(201,169,75,0.08);
+  }
+  .loader-titlebar {
+    display:flex; align-items:center; gap:6px;
+    padding:10px 16px;
+    background:#0e1e33;
+    border-bottom:1px solid rgba(201,169,75,0.12);
+  }
+  .loader-dot { width:10px; height:10px; border-radius:50%; }
+  .loader-title { font-family:'DM Mono',monospace; font-size:0.7rem; color:#4a6280; letter-spacing:0.1em; margin-left:6px; }
+  .loader-body { padding:24px; background:#08111f; min-height:180px; }
+  .loader-line {
+    font-family:'DM Mono',monospace; font-size:0.78rem; color:#8da3bf;
+    margin-bottom:6px; opacity:0;
+    animation: lineIn 0.3s ease forwards;
+  }
+  .loader-line.gold { color:#c9a94b; }
+  .loader-line.green { color:#22c55e; }
+  .loader-line.muted { color:#4a6280; }
+  @keyframes lineIn { from{ opacity:0; transform:translateX(-8px); } to{ opacity:1; transform:translateX(0); } }
+  .loader-cursor { display:inline-block; width:8px; height:14px; background:#c9a94b; vertical-align:middle; animation:blink 0.8s step-end infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .loader-bar-wrap { margin-top:20px; }
+  .loader-bar-label { font-family:'DM Mono',monospace; font-size:0.68rem; color:#4a6280; letter-spacing:0.1em; margin-bottom:6px; }
+  .loader-bar-track { width:100%; height:2px; background:rgba(255,255,255,0.06); border-radius:1px; }
+  .loader-progress { height:100%; background:linear-gradient(90deg,#c9a94b,#e4c97e); border-radius:1px; width:0%; transition:width 0.08s linear; }
+  .loader-skip { margin-top:18px; font-family:'DM Mono',monospace; font-size:0.68rem; color:#4a6280; letter-spacing:0.1em; cursor:pointer; background:none; border:none; transition:color 0.2s; }
+  .loader-skip:hover { color:#c9a94b; }
+
+  /* ── Particle Canvas ── */
+  #particle-canvas { position:absolute; inset:0; z-index:0; }
+
+  /* ── Gold gradient text ── */
+  .text-gold-grad {
+    background: linear-gradient(135deg,#c9a94b 0%,#f5e9c8 50%,#c9a94b 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+
+  /* ── Glass ── */
+  .glass {
+    background:rgba(14,30,51,0.6);
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border:1px solid rgba(201,169,75,0.12);
+  }
+  .light .glass { background:rgba(255,255,255,0.7); border-color:rgba(180,140,40,0.2); }
+
+  /* ── Glass hover ── */
+  .glass-hover { transition:background 0.3s, border-color 0.3s, transform 0.25s; }
+  .glass-hover:hover { background:rgba(20,40,68,0.85); border-color:rgba(201,169,75,0.3); transform:translateY(-3px); }
+  .light .glass-hover:hover { background:rgba(255,248,230,0.9); }
+
+  /* ── Nav link ── */
+  .nav-link {
+    position:relative; font-family:'DM Mono',monospace; font-size:0.72rem;
+    letter-spacing:0.12em; text-transform:uppercase; text-decoration:none;
+    color:#8da3bf; transition:color 0.2s;
+  }
+  .nav-link::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:1px; background:#c9a94b; transition:width 0.3s ease; }
+  .nav-link:hover, .nav-link.active { color:#e4c97e; }
+  .nav-link:hover::after, .nav-link.active::after { width:100%; }
+  .light .nav-link { color:#6b7280; }
+  .light .nav-link:hover { color:#7a6128; }
+
+  /* ── Scroll reveal ── */
+  .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+  .reveal-delay-1 { transition-delay:0.1s; }
+  .reveal-delay-2 { transition-delay:0.2s; }
+  .reveal-delay-3 { transition-delay:0.3s; }
+  .reveal-delay-4 { transition-delay:0.4s; }
+
+  /* ── Skill bar ── */
+  .skill-bar-fill {
+    height:2px; background:linear-gradient(90deg,#c9a94b,#e4c97e); border-radius:1px;
+    transform:scaleX(0); transform-origin:left;
+    transition:transform 1.2s cubic-bezier(0.16,1,0.3,1);
+  }
+  .skill-bar-fill.animate { transform:scaleX(1); }
+
+  /* ── Tag ── */
+  .tag-item {
+    font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.08em;
+    text-transform:uppercase; padding:4px 12px;
+    border:1px solid rgba(201,169,75,0.2); border-radius:2px;
+    color:#c9a94b; background:rgba(201,169,75,0.05);
+    transition:background 0.2s, border-color 0.2s;
+  }
+  .tag-item:hover { background:rgba(201,169,75,0.12); border-color:rgba(201,169,75,0.4); }
+
+  /* ── Btn ── */
+  .btn-gold {
+    display:inline-flex; align-items:center; gap:8px;
+    background:#c9a94b; color:#08111f; border-radius:2px;
+    font-family:'DM Mono',monospace; font-weight:600;
+    font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase;
+    padding:14px 32px; text-decoration:none;
+    transition:background 0.2s, transform 0.15s;
+    position:relative; overflow:hidden;
+  }
+  .btn-gold::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent); opacity:0; transition:opacity 0.3s; }
+  .btn-gold:hover::before { opacity:1; }
+  .btn-gold:hover { background:#e4c97e; transform:translateY(-2px); }
+
+  .btn-outline {
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid rgba(201,169,75,0.35); color:#c9a94b; border-radius:2px;
+    font-family:'DM Mono',monospace; font-size:0.78rem; letter-spacing:0.12em;
+    text-transform:uppercase; padding:14px 32px; text-decoration:none;
+    transition:background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+  .btn-outline:hover { background:rgba(201,169,75,0.08); border-color:#c9a94b; transform:translateY(-2px); }
+
+  /* ── Section bg ── */
+  .bg-section-alt { background:#0c1829; }
+  .light .bg-section-alt { background:#ede9e0; }
+  .bg-section-main { background:#08111f; }
+  .light .bg-section-main { background:#f4f1eb; }
+  .light .text-gold-grad { color:#7a6128; -webkit-text-fill-color:#7a6128; background:none; }
+
+  /* ── Theme toggle ── */
+  .theme-toggle {
+    width:40px; height:22px; border-radius:11px; position:relative; cursor:pointer;
+    border:1px solid rgba(201,169,75,0.3); background:rgba(201,169,75,0.08);
+    transition:background 0.3s; flex-shrink:0;
+  }
+  .theme-toggle .knob {
+    position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%;
+    background:#c9a94b; transition:transform 0.3s;
+  }
+  .light .theme-toggle .knob { transform:translateX(18px); }
+
+  /* ── Hex pattern bg ── */
+  .hex-bg {
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill='%23c9a94b' fill-opacity='0.025'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width:3px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:#7a6128; border-radius:2px; }
+
+  /* Light mode overrides */
+  .light nav { background:rgba(244,241,235,0.88) !important; border-color:rgba(180,140,40,0.15) !important; }
+  .light .project-row { background:#ede9e0 !important; border-color:rgba(180,140,40,0.12) !important; }
+  .light .project-row:hover { background:#e5e0d4 !important; }
+  .light .stat-card { border-color:rgba(180,140,40,0.15) !important; background:rgba(180,140,40,0.04) !important; }
+  .light .skill-section { background:#ede9e0 !important; }
+  .light .skill-group { background:#ede9e0 !important; }
+  .light .loader-body { background:#f4f1eb !important; }
+  .light #loader { background:#f4f1eb !important; }
+  .light .loader-window { border-color:rgba(180,140,40,0.2) !important; }
+</style>
+</head>
+<body class="antialiased">
+
+<!-- Scroll progress -->
+<div id="progress-bar"></div>
+
+<!-- ══════════════════════════════════════════
+     LOADING SCREEN
+══════════════════════════════════════════ -->
+<div id="loader">
+  <div class="loader-window">
+    <div class="loader-titlebar">
+      <div class="loader-dot" style="background:#ff5f57;"></div>
+      <div class="loader-dot" style="background:#ffbd2e;"></div>
+      <div class="loader-dot" style="background:#28ca41;"></div>
+      <span class="loader-title">terminal — bash</span>
+    </div>
+    <div class="loader-body">
+      <div id="loader-lines"></div>
+      <div class="loader-bar-wrap" id="loader-bar-wrap" style="display:none;">
+        <div class="loader-bar-label">Loading portfolio assets...</div>
+        <div class="loader-bar-track"><div class="loader-progress" id="loader-bar"></div></div>
+        <button class="loader-skip" id="loader-skip" onclick="skipLoader()">[ press any key to skip ]</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════ -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+     style="background:rgba(8,17,31,0.85); backdrop-filter:blur(16px); border-bottom:1px solid rgba(201,169,75,0.1);">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="font-mono-custom text-xs tracking-widest" style="color:#c9a94b;">
+      <span style="color:#4a6280;">[ </span>MIA<span style="color:#4a6280;"> ]</span>
+    </div>
+    <ul class="hidden md:flex items-center gap-8">
+      <li><a href="#about" class="nav-link">About</a></li>
+      <li><a href="#skills" class="nav-link">Skills</a></li>
+      <li><a href="#projects" class="nav-link">Projects</a></li>
+      <li><a href="#certifications" class="nav-link">Certs</a></li>
+      <li><a href="#contact" class="nav-link">Contact</a></li>
+    </ul>
+    <div class="flex items-center gap-4">
+      <!-- Theme toggle -->
+      <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
+        <div class="knob"></div>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section id="home" class="relative min-h-screen flex items-center overflow-hidden bg-section-main">
+  <!-- Particle canvas -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Grid overlay -->
+  <div class="absolute inset-0" style="background-image:linear-gradient(rgba(201,169,75,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,169,75,0.03) 1px,transparent 1px); background-size:60px 60px; z-index:1;"></div>
+
+  <!-- Glow blobs -->
+  <div class="absolute right-1/3 top-1/3 w-96 h-96 rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(201,169,75,0.07) 0%,transparent 70%); z-index:1;"></div>
+  <div class="absolute left-1/4 bottom-1/4 w-64 h-64 rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(61,142,232,0.05) 0%,transparent 70%); z-index:1;"></div>
+
+  <!-- Decorative rings -->
+  <div class="absolute right-[-60px] top-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full pointer-events-none" style="border:1px solid rgba(201,169,75,0.07); z-index:1;"></div>
+  <div class="absolute right-[30px] top-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full pointer-events-none" style="border:1px solid rgba(201,169,75,0.05); z-index:1;"></div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-6 md:px-16 pt-24 pb-16 w-full">
+    <div class="max-w-3xl">
+
+
+
+      <!-- Name -->
+      <h1 class="reveal reveal-delay-1 font-display leading-none mb-5"
+          style="font-size:clamp(3.5rem,8vw,6.5rem); font-weight:300; letter-spacing:-0.01em;">
+        Muhammad<br>
+        <span class="text-gold-grad" style="font-weight:600;">Iqbal</span>
+        <span style="color:#e8edf5;"> Alhamdani</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <div class="reveal reveal-delay-2 flex flex-wrap items-center gap-3 mb-5">
+        <span class="font-mono-custom text-sm tracking-widest uppercase" style="color:#8da3bf;">Blue Team Defender</span>
+        <div class="w-6 h-px" style="background:#c9a94b;"></div>
+        <span class="font-mono-custom text-sm tracking-widest uppercase" style="color:#8da3bf;">Full-Stack Developer</span>
+      </div>
+
+      <!-- Typewriter -->
+      <div class="reveal reveal-delay-2 flex items-center gap-2 mb-8 font-mono-custom text-xs" style="color:#4a6280;">
+        <span style="color:#c9a94b;">$</span>
+        <span id="typetext" style="color:#8da3bf;"></span><span class="loader-cursor" style="width:7px; height:13px; display:inline-block; background:#c9a94b; vertical-align:middle;"></span>
+      </div>
+
+      <!-- Description -->
+      <p class="reveal reveal-delay-3 text-base leading-relaxed mb-10 max-w-xl" style="color:#8da3bf; font-weight:300;">
+        Membangun pertahanan siber yang kuat dengan SIEM, SOAR, dan threat intelligence.
+        Mengamankan infrastruktur digital sambil membangun solusi developer yang berdampak.
+      </p>
+
+      <!-- CTA -->
+      <div class="reveal reveal-delay-4 flex flex-wrap gap-4">
+        <a href="#projects" class="btn-gold">
+          Lihat Projects
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#contact" class="btn-outline">Contact Me</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10" style="animation:float 3s ease-in-out infinite;">
+    <span class="font-mono-custom text-xs tracking-widest uppercase" style="color:#4a6280;">Scroll</span>
+    <div class="w-px h-10" style="background:linear-gradient(180deg,#4a6280,transparent);"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ABOUT
+══════════════════════════════════════════ -->
+<section id="about" class="relative py-28 hex-bg bg-section-alt" style="border-top:1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-6xl mx-auto px-6 md:px-16">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-16 items-start">
+
+      <!-- Avatar -->
+      <div class="md:col-span-2 reveal">
+        <div class="flex flex-col items-center text-center">
+          <div class="relative mb-6">
+            <div class="w-40 h-40 rounded-full flex items-center justify-center font-display text-5xl"
+                 style="background:linear-gradient(135deg,#0e1e33,#142844); border:1px solid rgba(201,169,75,0.25); color:#c9a94b; font-weight:300;">
+              MIA
+            </div>
+            <div class="absolute inset-[-14px] rounded-full pointer-events-none" style="border:1px dashed rgba(201,169,75,0.15); animation:spin 20s linear infinite;"></div>
+            <div class="absolute bottom-2 right-2 w-4 h-4 rounded-full flex items-center justify-center" style="background:#0c1829; border:2px solid #0c1829;">
+              <div class="w-2.5 h-2.5 rounded-full" style="background:#22c55e; animation:pulse 2s ease-in-out infinite;"></div>
+            </div>
+          </div>
+          <h3 class="font-display text-xl mb-1" style="font-weight:400;">Muhammad Iqbal Alhamdani</h3>
+          <p class="font-mono-custom text-xs tracking-widest uppercase mb-6" style="color:#c9a94b;">Application Security Engineer</p>
+          <div class="w-full space-y-2 text-left">
+            <div class="flex items-center gap-3 px-4 py-2.5 rounded-sm glass text-sm" style="font-size:0.8rem;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c9a94b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span style="color:#8da3bf;">Indonesia</span>
+            </div>
+            <div class="flex items-center gap-3 px-4 py-2.5 rounded-sm glass" style="font-size:0.8rem;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c9a94b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <span style="color:#8da3bf;">Blue Team / DevSecOps</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Text -->
+      <div class="md:col-span-3">
+        <div class="font-mono-custom text-xs tracking-widest uppercase mb-3 reveal" style="color:#c9a94b;">// about_me</div>
+        <h2 class="font-display mb-2 reveal reveal-delay-1" style="font-size:clamp(2rem,4vw,2.8rem); font-weight:300; line-height:1.15;">
+          Defender by mindset,<br><em style="color:#c9a94b;">Developer</em> by craft.
+        </h2>
+        <div class="w-12 h-px mb-8 reveal reveal-delay-1" style="background:linear-gradient(90deg,#c9a94b,transparent);"></div>
+
+        <div class="space-y-4 reveal reveal-delay-2" style="color:#8da3bf; font-size:0.92rem; font-weight:300; line-height:1.85;">
+          <p>Saya adalah profesional keamanan siber yang fokus pada <strong style="color:#e8edf5; font-weight:500;">Blue Team operations</strong> — membangun, mengoperasikan, dan mengoptimalkan sistem deteksi ancaman untuk melindungi infrastruktur digital secara proaktif.</p>
+          <p>Keahlian saya mencakup implementasi SIEM dengan <strong style="color:#c9a94b; font-weight:400;">Wazuh</strong> dan <strong style="color:#c9a94b; font-weight:400;">Elasticsearch</strong>, otomatisasi respons insiden melalui SOAR, serta pengelolaan daftar ancaman IP/URL untuk memperkuat postur keamanan organisasi.</p>
+          <p>Kemampuan <strong style="color:#e8edf5; font-weight:500;">full-stack development</strong> memungkinkan saya membangun tooling internal dan dashboard keamanan yang terintegrasi langsung dengan ekosistem SIEM.</p>
+        </div>
+
+        <!-- Animated Stats -->
+        <div class="grid grid-cols-3 gap-4 mt-10 reveal reveal-delay-3">
+          <div class="stat-card text-center py-5 rounded-sm" style="border:1px solid rgba(201,169,75,0.12); background:rgba(201,169,75,0.03);">
+            <div class="font-display text-4xl mb-1" style="color:#c9a94b; font-weight:600;">
+              <span class="counter" data-target="3" data-suffix="+">0</span>
+            </div>
+            <div class="font-mono-custom text-xs tracking-widest uppercase" style="color:#4a6280;">Projects</div>
+          </div>
+          <div class="stat-card text-center py-5 rounded-sm" style="border:1px solid rgba(201,169,75,0.12); background:rgba(201,169,75,0.03);">
+            <div class="font-display text-4xl mb-1" style="color:#c9a94b; font-weight:600;">
+              <span class="counter" data-target="2" data-suffix="">0</span>
+            </div>
+            <div class="font-mono-custom text-xs tracking-widest uppercase" style="color:#4a6280;">Sertifikasi</div>
+          </div>
+          <div class="stat-card text-center py-5 rounded-sm" style="border:1px solid rgba(201,169,75,0.12); background:rgba(201,169,75,0.03);">
+            <div class="font-display text-4xl mb-1" style="color:#c9a94b; font-weight:600;">∞</div>
+            <div class="font-mono-custom text-xs tracking-widest uppercase" style="color:#4a6280;">Curiosity</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SKILLS
+══════════════════════════════════════════ -->
+<section id="skills" class="relative py-28 bg-section-main" style="border-top:1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-6xl mx-auto px-6 md:px-16">
+    <div class="font-mono-custom text-xs tracking-widest uppercase mb-3 reveal" style="color:#c9a94b;">// technical_arsenal</div>
+    <h2 class="font-display mb-16 reveal reveal-delay-1" style="font-size:clamp(2rem,4vw,2.8rem); font-weight:300;">Skills & Tooling</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-px" style="background:rgba(255,255,255,0.04);">
+
+      <!-- Group 1 -->
+      <div class="reveal skill-group glass-hover p-8 space-y-5 bg-section-main">
+        <div class="font-mono-custom text-xs tracking-widest uppercase pb-3 mb-2" style="color:#c9a94b; border-bottom:1px solid rgba(201,169,75,0.12);">
+          <span style="color:#4a6280;">01 /</span> SIEM & Log Management
+        </div>
+        <ul class="space-y-4">
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">Wazuh</span><span class="font-mono-custom text-xs" style="color:#4a6280;">90%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:90%;"></div></div></li>
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">Elasticsearch</span><span class="font-mono-custom text-xs" style="color:#4a6280;">85%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:85%;"></div></div></li>
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">Kibana</span><span class="font-mono-custom text-xs" style="color:#4a6280;">80%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:80%;"></div></div></li>
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">Trend Micro</span><span class="font-mono-custom text-xs" style="color:#4a6280;">75%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:75%;"></div></div></li>
+        </ul>
+      </div>
+
+      <!-- Group 2 -->
+      <div class="reveal reveal-delay-1 skill-group glass-hover p-8 space-y-5 bg-section-main">
+        <div class="font-mono-custom text-xs tracking-widest uppercase pb-3 mb-2" style="color:#c9a94b; border-bottom:1px solid rgba(201,169,75,0.12);">
+          <span style="color:#4a6280;">02 /</span> Security Operations
+        </div>
+        <ul class="space-y-4">
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">SOAR / Automation</span><span class="font-mono-custom text-xs" style="color:#4a6280;">80%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:80%;"></div></div></li>
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">EDL Management</span><span class="font-mono-custom text-xs" style="color:#4a6280;">85%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:85%;"></div></div></li>
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">Threat Intelligence</span><span class="font-mono-custom text-xs" style="color:#4a6280;">78%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:78%;"></div></div></li>
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">Incident Response</span><span class="font-mono-custom text-xs" style="color:#4a6280;">75%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:75%;"></div></div></li>
+        </ul>
+      </div>
+
+      <!-- Group 3 -->
+      <div class="reveal reveal-delay-2 skill-group glass-hover p-8 space-y-5 bg-section-main">
+        <div class="font-mono-custom text-xs tracking-widest uppercase pb-3 mb-2" style="color:#c9a94b; border-bottom:1px solid rgba(201,169,75,0.12);">
+          <span style="color:#4a6280;">03 /</span> Development
+        </div>
+        <ul class="space-y-4">
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">Full-Stack Web</span><span class="font-mono-custom text-xs" style="color:#4a6280;">82%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:82%;"></div></div></li>
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">API & Integration</span><span class="font-mono-custom text-xs" style="color:#4a6280;">80%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:80%;"></div></div></li>
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">Security Tooling</span><span class="font-mono-custom text-xs" style="color:#4a6280;">78%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:78%;"></div></div></li>
+          <li><div class="flex justify-between mb-1.5"><span class="text-sm">Scripting & Automation</span><span class="font-mono-custom text-xs" style="color:#4a6280;">85%</span></div><div class="w-full h-px" style="background:rgba(255,255,255,0.06);"><div class="skill-bar-fill" style="width:85%;"></div></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     PROJECTS
+══════════════════════════════════════════ -->
+<section id="projects" class="relative py-28 bg-section-alt" style="border-top:1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-6xl mx-auto px-6 md:px-16">
+    <div class="font-mono-custom text-xs tracking-widest uppercase mb-3 reveal" style="color:#c9a94b;">// featured_work</div>
+    <h2 class="font-display mb-16 reveal reveal-delay-1" style="font-size:clamp(2rem,4vw,2.8rem); font-weight:300;">Projects & Research</h2>
+
+    <div style="border:1px solid rgba(255,255,255,0.04);">
+
+      <!-- P1 -->
+      <div class="reveal project-row group relative p-8 md:p-10 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start transition-colors duration-300"
+           style="background:#0c1829; border-bottom:1px solid rgba(255,255,255,0.04);">
+        <div class="absolute left-0 top-0 bottom-0 w-0.5 opacity-0 group-hover:opacity-100 transition-opacity" style="background:linear-gradient(180deg,transparent,#c9a94b,transparent);"></div>
+        <div>
+          <div class="flex items-center gap-4 mb-4">
+            <span class="font-mono-custom text-xs" style="color:#4a6280;">01</span>
+            <span class="tag-item">Security Infrastructure</span>
+          </div>
+          <h3 class="font-display text-2xl mb-3" style="font-weight:400;">Implementasi SIEM</h3>
+          <p class="text-sm leading-relaxed mb-5 max-w-2xl" style="color:#8da3bf; font-weight:300;">
+            Membangun sistem SIEM dari nol menggunakan Wazuh sebagai agent-based detection dan Elasticsearch sebagai backend log skala besar. Mencakup konfigurasi alert rules, korelasi event, dan real-time monitoring dashboard yang komprehensif untuk deteksi ancaman proaktif.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="tag-item">Wazuh</span><span class="tag-item">Elasticsearch</span>
+            <span class="tag-item">Kibana</span><span class="tag-item">Log Correlation</span><span class="tag-item">Blue Team</span>
+          </div>
+        </div>
+        <div class="self-center p-3 rounded-sm transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" style="border:1px solid rgba(201,169,75,0.15); color:#4a6280;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </div>
+      </div>
+
+      <!-- P2 -->
+      <div class="reveal reveal-delay-1 project-row group relative p-8 md:p-10 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start transition-colors duration-300"
+           style="background:#0c1829; border-bottom:1px solid rgba(255,255,255,0.04);">
+        <div class="absolute left-0 top-0 bottom-0 w-0.5 opacity-0 group-hover:opacity-100 transition-opacity" style="background:linear-gradient(180deg,transparent,#c9a94b,transparent);"></div>
+        <div>
+          <div class="flex items-center gap-4 mb-4">
+            <span class="font-mono-custom text-xs" style="color:#4a6280;">02</span>
+            <span class="tag-item">Threat Intelligence</span>
+          </div>
+          <h3 class="font-display text-2xl mb-3" style="font-weight:400;">External Dynamic List (EDL)</h3>
+          <p class="text-sm leading-relaxed mb-5 max-w-2xl" style="color:#8da3bf; font-weight:300;">
+            Merancang dan mengembangkan sistem EDL otomatis untuk mengelola daftar IP dan URL berbahaya secara dinamis. Terintegrasi dengan firewall dan platform keamanan jaringan untuk pemblokiran real-time berdasarkan data threat intelligence terkini.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="tag-item">Threat Intel</span><span class="tag-item">IP Blocklist</span>
+            <span class="tag-item">URL Filtering</span><span class="tag-item">Automation</span><span class="tag-item">Firewall</span>
+          </div>
+        </div>
+        <div class="self-center p-3 rounded-sm transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" style="border:1px solid rgba(201,169,75,0.15); color:#4a6280;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </div>
+      </div>
+
+      <!-- P3 -->
+      <div class="reveal reveal-delay-2 project-row group relative p-8 md:p-10 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start transition-colors duration-300"
+           style="background:#0c1829;">
+        <div class="absolute left-0 top-0 bottom-0 w-0.5 opacity-0 group-hover:opacity-100 transition-opacity" style="background:linear-gradient(180deg,transparent,#c9a94b,transparent);"></div>
+        <div>
+          <div class="flex items-center gap-4 mb-4">
+            <span class="font-mono-custom text-xs" style="color:#4a6280;">03</span>
+            <span class="tag-item">Incident Response</span>
+          </div>
+          <h3 class="font-display text-2xl mb-3" style="font-weight:400;">Security Orchestration, Automation & Response (SOAR)</h3>
+          <p class="text-sm leading-relaxed mb-5 max-w-2xl" style="color:#8da3bf; font-weight:300;">
+            Membangun alur kerja SOAR untuk mengotomatiskan respons insiden keamanan yang terdeteksi SIEM. Mencakup triage otomatis, eskalasi notifikasi, dan eksekusi playbook remediasi — mengurangi mean time to respond secara signifikan.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="tag-item">SOAR</span><span class="tag-item">Playbook</span>
+            <span class="tag-item">Orchestration</span><span class="tag-item">IR Automation</span><span class="tag-item">Workflow</span>
+          </div>
+        </div>
+        <div class="self-center p-3 rounded-sm transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" style="border:1px solid rgba(201,169,75,0.15); color:#4a6280;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CERTIFICATIONS
+══════════════════════════════════════════ -->
+<section id="certifications" class="relative py-28 bg-section-main" style="border-top:1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-6xl mx-auto px-6 md:px-16">
+    <div class="font-mono-custom text-xs tracking-widest uppercase mb-3 reveal" style="color:#c9a94b;">// credentials</div>
+    <h2 class="font-display mb-16 reveal reveal-delay-1" style="font-size:clamp(2rem,4vw,2.8rem); font-weight:300;">Certifications</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <div class="reveal glass glass-hover p-8 relative overflow-hidden rounded-sm">
+        <div class="absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(201,169,75,0.06) 0%,transparent 70%); transform:translate(30%,-30%);"></div>
+        <div class="absolute left-0 top-0 bottom-0 w-0.5" style="background:linear-gradient(180deg,rgba(201,169,75,0.6),rgba(201,169,75,0.1));"></div>
+        <div class="w-12 h-12 rounded-sm flex items-center justify-center mb-6" style="background:rgba(201,169,75,0.1); border:1px solid rgba(201,169,75,0.2);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a94b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="font-mono-custom text-xs tracking-widest uppercase mb-2" style="color:#c9a94b;">BNSP</div>
+        <h3 class="font-display text-2xl mb-2" style="font-weight:400;">Junior Cyber Security</h3>
+        <p class="text-sm" style="color:#8da3bf; font-weight:300;">Badan Nasional Sertifikasi Profesi · Keamanan Siber</p>
+        <div class="mt-6 flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full" style="background:#22c55e;"></div>
+          <span class="font-mono-custom text-xs" style="color:#4a6280;">Terverifikasi</span>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-1 glass glass-hover p-8 relative overflow-hidden rounded-sm">
+        <div class="absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(201,169,75,0.06) 0%,transparent 70%); transform:translate(30%,-30%);"></div>
+        <div class="absolute left-0 top-0 bottom-0 w-0.5" style="background:linear-gradient(180deg,rgba(201,169,75,0.6),rgba(201,169,75,0.1));"></div>
+        <div class="w-12 h-12 rounded-sm flex items-center justify-center mb-6" style="background:rgba(201,169,75,0.1); border:1px solid rgba(201,169,75,0.2);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a94b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <div class="font-mono-custom text-xs tracking-widest uppercase mb-2" style="color:#c9a94b;">BNSP</div>
+        <h3 class="font-display text-2xl mb-2" style="font-weight:400;">Junior Developer Programmer</h3>
+        <p class="text-sm" style="color:#8da3bf; font-weight:300;">Badan Nasional Sertifikasi Profesi · Pengembangan Perangkat Lunak</p>
+        <div class="mt-6 flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full" style="background:#22c55e;"></div>
+          <span class="font-mono-custom text-xs" style="color:#4a6280;">Terverifikasi</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CONTACT
+══════════════════════════════════════════ -->
+<section id="contact" class="relative py-28 hex-bg bg-section-alt text-center" style="border-top:1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-2xl mx-auto px-6 md:px-16">
+    <div class="font-mono-custom text-xs tracking-widest uppercase mb-3 reveal" style="color:#c9a94b;">// contact</div>
+    <h2 class="font-display mb-4 reveal reveal-delay-1" style="font-size:clamp(2rem,4vw,2.8rem); font-weight:300;">Mari Berkolaborasi</h2>
+    <p class="text-sm leading-relaxed mb-12 reveal reveal-delay-2" style="color:#8da3bf; font-weight:300;">
+      Terbuka untuk diskusi proyek, kolaborasi riset keamanan, atau berbagi wawasan seputar Blue Team operations dan pengembangan software.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3 reveal reveal-delay-3">
+      <a href="/cdn-cgi/l/email-protection#7c150d1e1d103c19111d1510521f1311" class="btn-gold">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </a>
+      <a href="https://linkedin.com" target="_blank" rel="noopener" class="btn-outline">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://github.com" target="_blank" rel="noopener" class="btn-outline">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-6 bg-section-main" style="border-top:1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-6xl mx-auto px-6 md:px-16 flex flex-col md:flex-row items-center justify-between gap-3">
+    <span class="font-mono-custom text-xs" style="color:#4a6280;">© 2025 Muhammad Iqbal Alhamdani</span>
+    <span class="font-mono-custom text-xs uppercase tracking-widest" style="color:#4a6280;">Blue Team Defender / Full-Stack Developer</span>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════ SCRIPTS ══════════════════════════════════════════ -->
+<script>
+/* ─── Loader ─── */
+let loaderDone = false;
+
+function dismissLoader() {
+  if (loaderDone) return;
+  loaderDone = true;
+  const el = document.getElementById('loader');
+  if (el) el.classList.add('hide');
+  document.body.style.overflow = '';
+  setTimeout(() => { initReveal(); initCounters(); initParticles(); startAnimate(); }, 100);
+}
+
+/* Click anywhere OR any key to skip */
+document.addEventListener('keydown', dismissLoader, { once: true });
+document.addEventListener('click', dismissLoader, { once: true });
+
+/* Auto-dismiss after animation completes */
+document.body.style.overflow = 'hidden';
+
+const loaderLines = [
+  { text: '$ ssh iqbal@portfolio.dev', cls: 'gold', delay: 0 },
+  { text: 'Authenticating...', cls: 'muted', delay: 350 },
+  { text: '✓ Connection established', cls: 'green', delay: 750 },
+  { text: '$ wazuh-control status', cls: 'gold', delay: 1050 },
+  { text: 'Wazuh Manager: running', cls: '', delay: 1350 },
+  { text: 'Elasticsearch: active', cls: '', delay: 1550 },
+  { text: 'SOAR engine: online', cls: '', delay: 1750 },
+  { text: '$ load portfolio --user=iqbal', cls: 'gold', delay: 2000 },
+];
+
+const linesEl = document.getElementById('loader-lines');
+const barWrap = document.getElementById('loader-bar-wrap');
+const barFill = document.getElementById('loader-bar');
+
+loaderLines.forEach(({ text, cls, delay }) => {
+  setTimeout(() => {
+    if (loaderDone) return;
+    const d = document.createElement('div');
+    d.className = 'loader-line' + (cls ? ' ' + cls : '');
+    d.textContent = text;
+    linesEl.appendChild(d);
+  }, delay);
+});
+
+setTimeout(() => {
+  if (loaderDone) return;
+  barWrap.style.display = 'block';
+  let w = 0;
+  const iv = setInterval(() => {
+    if (loaderDone) { clearInterval(iv); return; }
+    w += 3;
+    barFill.style.width = Math.min(w, 100) + '%';
+    if (w >= 100) {
+      clearInterval(iv);
+      setTimeout(dismissLoader, 200);
+    }
+  }, 18);
+}, 2200);
+
+/* Failsafe: always dismiss after 6s no matter what */
+setTimeout(dismissLoader, 6000);
+
+/* ─── Particles (init AFTER loader dismissed) ─── */
+let canvas, ctx, particles = [], W, H, mouse = { x: null, y: null }, animating = false;
+
+function initParticles() {
+  try {
+    canvas = document.getElementById('particle-canvas');
+    if (!canvas) return;
+    ctx = canvas.getContext('2d');
+    W = canvas.width = canvas.offsetWidth || window.innerWidth;
+    H = canvas.height = canvas.offsetHeight || window.innerHeight;
+    particles = [];
+    for (let i = 0; i < 80; i++) particles.push(newParticle());
+
+    const heroSection = document.getElementById('home');
+    if (heroSection) {
+      heroSection.addEventListener('mousemove', e => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      });
+      heroSection.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+    }
+    window.addEventListener('resize', () => {
+      W = canvas.width = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+      particles = particles.map(() => newParticle());
+    });
+  } catch(e) { console.warn('Particle init failed:', e); }
+}
+
+function newParticle() {
+  return {
+    x: Math.random() * (W || 100), y: Math.random() * (H || 100),
+    vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+    r: Math.random() * 1.5 + 0.5, alpha: Math.random() * 0.5 + 0.1
+  };
+}
+
+function startAnimate() {
+  if (animating || !ctx) return;
+  animating = true;
+  (function loop() {
+    try {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(201,169,75,${p.alpha})`;
+        ctx.fill();
+      });
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const d = Math.sqrt(dx*dx + dy*dy);
+          if (d < 120) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(201,169,75,${0.12*(1-d/120)})`;
+            ctx.lineWidth = 0.5; ctx.stroke();
+          }
+        }
+        if (mouse.x !== null) {
+          const dx = particles[i].x - mouse.x;
+          const dy = particles[i].y - mouse.y;
+          const d = Math.sqrt(dx*dx + dy*dy);
+          if (d < 160) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = `rgba(201,169,75,${0.25*(1-d/160)})`;
+            ctx.lineWidth = 0.6; ctx.stroke();
+          }
+        }
+      }
+    } catch(e) {}
+    requestAnimationFrame(loop);
+  })();
+}
+
+/* ─── Scroll progress + active nav ─── */
+window.addEventListener('scroll', () => {
+  const total = document.body.scrollHeight - window.innerHeight;
+  if (total > 0) document.getElementById('progress-bar').style.width = (window.scrollY / total * 100) + '%';
+  const sections = document.querySelectorAll('section[id]');
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+  });
+});
+
+/* ─── Scroll Reveal ─── */
+function initReveal() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        e.target.querySelectorAll('.skill-bar-fill').forEach(b => b.classList.add('animate'));
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  const barObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('animate'); });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.skill-bar-fill').forEach(b => barObs.observe(b));
+}
+
+/* ─── Animated Counters ─── */
+function initCounters() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !e.target.dataset.done) {
+        e.target.dataset.done = '1';
+        const target = parseInt(e.target.dataset.target);
+        const suffix = e.target.dataset.suffix || '';
+        let cur = 0;
+        const step = Math.ceil(target / 30);
+        const iv = setInterval(() => {
+          cur = Math.min(cur + step, target);
+          e.target.textContent = cur + suffix;
+          if (cur >= target) clearInterval(iv);
+        }, 40);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.counter').forEach(el => obs.observe(el));
+}
+
+/* ─── Typewriter ─── */
+const phrases = [
+  'wazuh --monitor all-endpoints',
+  'elasticsearch --index security-logs',
+  'soar --run incident-playbook',
+  'edl --update threat-intel-feed',
+];
+let pi = 0, ci = 0, deleting = false;
+const typeEl = document.getElementById('typetext');
+function type() {
+  const phrase = phrases[pi];
+  if (!deleting) {
+    typeEl.textContent = phrase.slice(0, ++ci);
+    if (ci === phrase.length) { deleting = true; setTimeout(type, 1800); return; }
+  } else {
+    typeEl.textContent = phrase.slice(0, --ci);
+    if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; }
+  }
+  setTimeout(type, deleting ? 38 : 72);
+}
+setTimeout(type, 500);
+
+/* ─── Dark / Light Mode ─── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.classList.contains('dark');
+  html.classList.toggle('dark', !isDark);
+  html.classList.toggle('light', isDark);
+}
+</script>
+</body>
+</html>
