@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammad Iqbal Alhamdani — Blue Team Defender</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ display:['Cormorant Garamond','serif'], mono:['DM Mono','monospace'], sans:['Outfit','sans-serif'] } } } }
+</script>
+<style>
+/* ══ CSS Variables — Dark ══ */
+:root {
+  --bg-main:#08111f; --bg-alt:#0c1829; --bg-card:#0e1e33; --bg-card-h:#142844;
+  --text-p:#e8edf5; --text-s:#8da3bf; --text-m:#4a6280;
+  --border-s:rgba(255,255,255,0.05); --border-g:rgba(201,169,75,0.15); --border-gh:rgba(201,169,75,0.35);
+  --glass:rgba(14,30,51,0.65); --avatar-bg:linear-gradient(135deg,#0e1e33,#142844);
+  --nav-bg:rgba(8,17,31,0.88); --skill-track:rgba(255,255,255,0.06);
+  --stat-bg:rgba(201,169,75,0.03); --stat-b:rgba(201,169,75,0.12);
+  --gold:#c9a94b; --gold-l:#e4c97e; --gold-d:#7a6128;
+}
+/* ══ CSS Variables — Light ══ */
+html.light {
+  --bg-main:#f4f1eb; --bg-alt:#ede9e0; --bg-card:#e5e0d5; --bg-card-h:#dbd5c8;
+  --text-p:#1a1a1a; --text-s:#4a5568; --text-m:#9ca3af;
+  --border-s:rgba(0,0,0,0.06); --border-g:rgba(122,97,40,0.2); --border-gh:rgba(122,97,40,0.4);
+  --glass:rgba(255,255,255,0.75); --avatar-bg:linear-gradient(135deg,#e5e0d5,#dbd5c8);
+  --nav-bg:rgba(244,241,235,0.92); --skill-track:rgba(0,0,0,0.08);
+  --stat-bg:rgba(122,97,40,0.04); --stat-b:rgba(122,97,40,0.15);
+  --gold:#8a6a1e; --gold-l:#a07d28; --gold-d:#c9a94b;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;font-weight:300;line-height:1.7;background:var(--bg-main);color:var(--text-p);transition:background .3s,color .3s;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.35;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E")}
+::-webkit-scrollbar{width:3px} ::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:2px}
+
+/* Progress bar */
+#progress-bar{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold-l));z-index:9999;transition:width .1s linear}
+
+/* Loader */
+#loader{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#050d1a;transition:opacity .5s,visibility .5s}
+#loader.hide{opacity:0;visibility:hidden}
+.lw{width:min(540px,90vw);border:1px solid rgba(201,169,75,.2);border-radius:6px;overflow:hidden;box-shadow:0 0 60px rgba(201,169,75,.07)}
+.ltb{display:flex;align-items:center;gap:6px;padding:10px 16px;background:#0e1e33;border-bottom:1px solid rgba(201,169,75,.1)}
+.ldot{width:10px;height:10px;border-radius:50%}
+.ltitle{font-family:'DM Mono',monospace;font-size:.7rem;color:#4a6280;letter-spacing:.1em;margin-left:6px}
+.lbody{padding:24px;background:#08111f;min-height:180px}
+.ll{font-family:'DM Mono',monospace;font-size:.78rem;color:#8da3bf;margin-bottom:6px;opacity:0;animation:lineIn .3s ease forwards}
+.ll.gold{color:#c9a94b} .ll.green{color:#22c55e} .ll.muted{color:#4a6280}
+@keyframes lineIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.lbw{margin-top:20px}
+.lbl{font-family:'DM Mono',monospace;font-size:.68rem;color:#4a6280;letter-spacing:.1em;margin-bottom:6px}
+.lbt{width:100%;height:2px;background:rgba(255,255,255,.06);border-radius:1px}
+.lbf{height:100%;background:linear-gradient(90deg,#c9a94b,#e4c97e);border-radius:1px;width:0%;transition:width .06s linear}
+.lskip{margin-top:14px;font-family:'DM Mono',monospace;font-size:.68rem;color:#4a6280;letter-spacing:.1em;cursor:pointer;background:none;border:none;transition:color .2s}
+.lskip:hover{color:#c9a94b}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;background:var(--nav-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-g);transition:background .3s}
+.nav-link{position:relative;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--text-s);transition:color .2s}
+.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--gold);transition:width .3s}
+.nav-link:hover,.nav-link.active{color:var(--gold-l)}
+.nav-link:hover::after,.nav-link.active::after{width:100%}
+
+/* Mobile menu */
+#mob-menu{display:none}
+#mob-menu.open{display:flex;flex-direction:column;position:fixed;top:57px;left:0;right:0;background:var(--nav-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-g);z-index:49}
+#mob-menu a{padding:14px 24px;font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-s);text-decoration:none;border-bottom:1px solid var(--border-s);transition:color .2s,background .2s}
+#mob-menu a:hover{color:var(--gold);background:rgba(201,169,75,.04)}
+.hbg{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none}
+.hbg span{display:block;width:20px;height:1.5px;background:var(--text-s);border-radius:1px;transition:all .3s}
+@media(max-width:767px){.hbg{display:flex} .nav-desktop{display:none!important}}
+
+/* Theme toggle */
+.ttoggle{width:38px;height:20px;border-radius:10px;position:relative;cursor:pointer;border:1px solid var(--border-gh);background:var(--stat-bg);transition:background .3s;flex-shrink:0}
+.ttoggle .knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--gold);transition:transform .3s}
+html.light .ttoggle .knob{transform:translateX(18px)}
+
+/* Layout */
+.bg-main{background:var(--bg-main)} .bg-alt{background:var(--bg-alt)}
+.inner{max-width:1100px;margin:0 auto}
+.sp{padding:4rem 1.5rem}
+@media(min-width:640px){.sp{padding:5rem 2rem}}
+@media(min-width:1024px){.sp{padding:7rem 4rem}}
+
+/* Hero grid */
+.hero-grid{background-image:linear-gradient(var(--border-g) 1px,transparent 1px),linear-gradient(90deg,var(--border-g) 1px,transparent 1px);background-size:60px 60px}
+
+/* Gold gradient text */
+.tgg{background:linear-gradient(135deg,var(--gold) 0%,var(--gold-l) 50%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* Glass */
+.glass{background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border-g)}
+.glass-h{transition:background .3s,border-color .3s,transform .25s}
+.glass-h:hover{background:var(--bg-card-h);border-color:var(--border-gh);transform:translateY(-3px)}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+/* Skill bar */
+.strack{width:100%;height:2px;background:var(--skill-track);border-radius:1px}
+.sbar{height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-l));border-radius:1px;transform:scaleX(0);transform-origin:left;transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
+.sbar.animate{transform:scaleX(1)}
+
+/* Tag */
+.tag{font-family:'DM Mono',monospace;font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border:1px solid var(--border-g);border-radius:2px;color:var(--gold);background:var(--stat-bg);transition:background .2s,border-color .2s;white-space:nowrap}
+.tag:hover{background:rgba(201,169,75,.1);border-color:var(--border-gh)}
+
+/* Buttons */
+.btn-g{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#08111f;border-radius:2px;font-family:'DM Mono',monospace;font-weight:600;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding:12px 28px;text-decoration:none;transition:background .2s,transform .15s}
+.btn-g:hover{background:var(--gold-l);transform:translateY(-2px)}
+.btn-o{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border-gh);color:var(--gold);border-radius:2px;font-family:'DM Mono',monospace;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding:12px 28px;text-decoration:none;transition:background .2s,border-color .2s,transform .15s}
+.btn-o:hover{background:var(--stat-bg);border-color:var(--gold);transform:translateY(-2px)}
+
+/* Project */
+.prow{background:var(--bg-alt);border-bottom:1px solid var(--border-s);position:relative;transition:background .25s}
+.prow:last-child{border-bottom:none}
+.prow:hover{background:var(--bg-card)}
+.pacc{position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .3s}
+.prow:hover .pacc{opacity:1}
+.parrow{padding:10px;border:1px solid var(--border-g);color:var(--text-m);border-radius:2px;flex-shrink:0;transition:all .25s}
+.prow:hover .parrow{color:var(--gold);transform:translate(3px,-3px)}
+
+/* Cert */
+.ccard{background:var(--bg-card);border:1px solid var(--border-s);padding:2rem;position:relative;overflow:hidden;border-radius:2px;transition:border-color .25s,transform .25s}
+.ccard:hover{border-color:var(--border-gh);transform:translateY(-3px)}
+.cacc{position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--gold),rgba(201,169,75,.1))}
+
+/* Section helpers */
+.slabel{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.sdiv{width:48px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:2rem}
+
+/* Hex bg */
+.hexbg{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill='%23c9a94b' fill-opacity='0.025'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9z'/%3E%3C/g%3E%3C/svg%3E")}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+@keyframes float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="lw">
+    <div class="ltb">
+      <div class="ldot" style="background:#ff5f57"></div>
+      <div class="ldot" style="background:#ffbd2e"></div>
+      <div class="ldot" style="background:#28ca41"></div>
+      <span class="ltitle">terminal — bash</span>
+    </div>
+    <div class="lbody">
+      <div id="ll"></div>
+      <div id="lbw" style="display:none">
+        <div class="lbl">Loading portfolio assets...</div>
+        <div class="lbt"><div class="lbf" id="lb"></div></div>
+        <button class="lskip" onclick="dismissLoader()">[ press any key or click to skip ]</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="inner flex items-center justify-between px-6 py-4" style="max-width:1200px">
+    <div style="font-family:'DM Mono',monospace;font-size:.78rem;letter-spacing:.15em;color:var(--gold)">
+      <span style="color:var(--text-m)">[ </span>MIA<span style="color:var(--text-m)"> ]</span>
+    </div>
+    <ul class="nav-desktop flex items-center gap-8" style="list-style:none">
+      <li><a href="#about"          class="nav-link">About</a></li>
+      <li><a href="#skills"         class="nav-link">Skills</a></li>
+      <li><a href="#projects"       class="nav-link">Projects</a></li>
+      <li><a href="#certifications" class="nav-link">Certs</a></li>
+      <li><a href="#contact"        class="nav-link">Contact</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button onclick="toggleTheme()" class="ttoggle" aria-label="Toggle theme"><div class="knob"></div></button>
+      <button class="hbg" onclick="toggleMenu()" id="hbg" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div id="mob-menu">
+    <a href="#about"          onclick="toggleMenu()">About</a>
+    <a href="#skills"         onclick="toggleMenu()">Skills</a>
+    <a href="#projects"       onclick="toggleMenu()">Projects</a>
+    <a href="#certifications" onclick="toggleMenu()">Certs</a>
+    <a href="#contact"        onclick="toggleMenu()">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home" class="bg-main hero-grid relative flex items-center overflow-hidden" style="min-height:100vh;padding-top:57px">
+  <div class="hidden md:block absolute" style="right:-80px;top:50%;transform:translateY(-50%);width:560px;height:560px;border-radius:50%;border:1px solid var(--border-g);pointer-events:none"></div>
+  <div class="hidden md:block absolute" style="right:20px;top:50%;transform:translateY(-50%);width:400px;height:400px;border-radius:50%;border:1px solid rgba(201,169,75,.05);pointer-events:none"></div>
+  <div class="absolute" style="right:30%;top:30%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(201,169,75,.06) 0%,transparent 70%);pointer-events:none"></div>
+
+  <div class="inner sp w-full relative" style="z-index:2">
+    <div style="max-width:680px">
+      <h1 class="reveal font-display" style="font-size:clamp(2.8rem,8vw,6rem);font-weight:300;line-height:1.05;letter-spacing:-.01em;margin-bottom:.4em">
+        Muhammad<br>
+        <span class="tgg" style="font-weight:600">Iqbal</span>
+        <span style="color:var(--text-p)"> Alhamdani</span>
+      </h1>
+      <div class="reveal d1" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:1rem">
+        <span style="font-family:'DM Mono',monospace;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-s)">Blue Team Defender</span>
+        <div style="width:24px;height:1px;background:var(--gold);flex-shrink:0"></div>
+        <span style="font-family:'DM Mono',monospace;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-s)">Full-Stack Developer</span>
+      </div>
+      <div class="reveal d2" style="display:flex;align-items:center;gap:6px;margin-bottom:1.5rem;font-family:'DM Mono',monospace;font-size:.8rem">
+        <span style="color:var(--gold)">$</span>
+        <span id="typetext" style="color:var(--text-s)"></span>
+        <span style="display:inline-block;width:7px;height:14px;background:var(--gold);vertical-align:middle;animation:blink 1s step-end infinite"></span>
+      </div>
+      <p class="reveal d3" style="font-size:.95rem;line-height:1.85;color:var(--text-s);max-width:520px;margin-bottom:2.5rem">
+        Membangun pertahanan siber yang kuat dengan SIEM, SOAR, dan threat intelligence.
+        Mengamankan infrastruktur digital sambil membangun solusi developer yang berdampak.
+      </p>
+      <div class="reveal d4" style="display:flex;flex-wrap:wrap;gap:12px">
+        <a href="#projects" class="btn-g">Lihat Projects <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        <a href="#contact" class="btn-o">Contact Me</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:absolute;bottom:2rem;left:50%;animation:float 3s ease-in-out infinite;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2">
+    <span style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-m)">Scroll</span>
+    <div style="width:1px;height:32px;background:linear-gradient(180deg,var(--text-m),transparent)"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="bg-alt hexbg sp" style="border-top:1px solid var(--border-s)">
+  <div class="inner">
+    <div id="about-grid" style="display:grid;grid-template-columns:1fr;gap:3rem">
+
+      <div class="reveal" style="display:flex;flex-direction:column;align-items:center;text-align:center;max-width:280px;margin:0 auto">
+        <div style="position:relative;margin-bottom:1.5rem">
+          <div style="width:140px;height:140px;border-radius:50%;background:var(--avatar-bg);border:1px solid var(--border-g);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--gold)">MIA</div>
+          <div style="position:absolute;inset:-12px;border-radius:50%;border:1px dashed var(--border-g);animation:spin 20s linear infinite;pointer-events:none"></div>
+          <div style="position:absolute;bottom:4px;right:4px;width:16px;height:16px;border-radius:50%;background:var(--bg-alt);display:flex;align-items:center;justify-content:center">
+            <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;animation:pulse 2s ease-in-out infinite"></div>
+          </div>
+        </div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:400;color:var(--text-p);margin-bottom:4px">Muhammad Iqbal Alhamdani</h3>
+        <p style="font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem">Application Security Engineer</p>
+        <div style="width:100%;display:flex;flex-direction:column;gap:8px;text-align:left">
+          <div class="glass" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:4px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span style="font-size:.82rem;color:var(--text-s)">Indonesia</span>
+          </div>
+          <div class="glass" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:4px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <span style="font-size:.82rem;color:var(--text-s)">Blue Team / DevSecOps</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="slabel reveal">// about_me</div>
+        <h2 class="reveal d1 font-display" style="font-size:clamp(1.8rem,4vw,2.6rem);font-weight:300;color:var(--text-p);line-height:1.2;margin-bottom:.5rem">
+          Defender by mindset,<br><em style="color:var(--gold)">Developer</em> by craft.
+        </h2>
+        <div class="sdiv reveal d1"></div>
+        <div class="reveal d2" style="display:flex;flex-direction:column;gap:1rem;font-size:.92rem;font-weight:300;line-height:1.85;color:var(--text-s)">
+          <p>Saya adalah profesional keamanan siber yang fokus pada <strong style="color:var(--text-p);font-weight:500">Blue Team operations</strong> — membangun, mengoperasikan, dan mengoptimalkan sistem deteksi ancaman untuk melindungi infrastruktur digital secara proaktif.</p>
+          <p>Keahlian saya mencakup implementasi SIEM dengan <strong style="color:var(--gold);font-weight:400">Wazuh</strong> dan <strong style="color:var(--gold);font-weight:400">Elasticsearch</strong>, otomatisasi respons insiden melalui SOAR, serta pengelolaan daftar ancaman IP/URL untuk memperkuat postur keamanan organisasi.</p>
+          <p>Kemampuan <strong style="color:var(--text-p);font-weight:500">full-stack development</strong> memungkinkan saya membangun tooling internal dan dashboard keamanan yang terintegrasi langsung dengan ekosistem SIEM.</p>
+        </div>
+        <div class="reveal d3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:2.5rem">
+          <div style="text-align:center;padding:1.25rem .5rem;border-radius:2px;border:1px solid var(--stat-b);background:var(--stat-bg)">
+            <div class="font-display" style="font-size:2.5rem;font-weight:600;color:var(--gold);line-height:1"><span class="counter" data-target="3" data-suffix="+">0</span></div>
+            <div style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-m);margin-top:4px">Projects</div>
+          </div>
+          <div style="text-align:center;padding:1.25rem .5rem;border-radius:2px;border:1px solid var(--stat-b);background:var(--stat-bg)">
+            <div class="font-display" style="font-size:2.5rem;font-weight:600;color:var(--gold);line-height:1"><span class="counter" data-target="2" data-suffix="">0</span></div>
+            <div style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-m);margin-top:4px">Sertifikasi</div>
+          </div>
+          <div style="text-align:center;padding:1.25rem .5rem;border-radius:2px;border:1px solid var(--stat-b);background:var(--stat-bg)">
+            <div class="font-display" style="font-size:2.5rem;font-weight:600;color:var(--gold);line-height:1">∞</div>
+            <div style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-m);margin-top:4px">Curiosity</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="bg-main sp" style="border-top:1px solid var(--border-s)">
+  <div class="inner">
+    <div class="slabel reveal">// technical_arsenal</div>
+    <h2 class="reveal d1 font-display" style="font-size:clamp(1.8rem,4vw,2.6rem);font-weight:300;color:var(--text-p);margin-bottom:3rem">Skills & Tooling</h2>
+    <div id="skills-grid" style="display:grid;grid-template-columns:1fr;gap:1px;background:var(--border-s)">
+
+      <div class="reveal bg-main glass-h" style="padding:2rem">
+        <div style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--border-g);padding-bottom:.75rem;margin-bottom:1.5rem"><span style="color:var(--text-m)">01 /</span> SIEM & Log Management</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:1rem">
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">Wazuh</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">90%</span></div><div class="strack"><div class="sbar" style="width:90%"></div></div></li>
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">Elasticsearch</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">85%</span></div><div class="strack"><div class="sbar" style="width:85%"></div></div></li>
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">Kibana</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">80%</span></div><div class="strack"><div class="sbar" style="width:80%"></div></div></li>
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">Trend Micro</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">75%</span></div><div class="strack"><div class="sbar" style="width:75%"></div></div></li>
+        </ul>
+      </div>
+
+      <div class="reveal d1 bg-main glass-h" style="padding:2rem">
+        <div style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--border-g);padding-bottom:.75rem;margin-bottom:1.5rem"><span style="color:var(--text-m)">02 /</span> Security Operations</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:1rem">
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">SOAR / Automation</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">80%</span></div><div class="strack"><div class="sbar" style="width:80%"></div></div></li>
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">EDL Management</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">85%</span></div><div class="strack"><div class="sbar" style="width:85%"></div></div></li>
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">Threat Intelligence</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">78%</span></div><div class="strack"><div class="sbar" style="width:78%"></div></div></li>
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">Incident Response</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">75%</span></div><div class="strack"><div class="sbar" style="width:75%"></div></div></li>
+        </ul>
+      </div>
+
+      <div class="reveal d2 bg-main glass-h" style="padding:2rem">
+        <div style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--border-g);padding-bottom:.75rem;margin-bottom:1.5rem"><span style="color:var(--text-m)">03 /</span> Development</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:1rem">
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">Full-Stack Web</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">82%</span></div><div class="strack"><div class="sbar" style="width:82%"></div></div></li>
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">API & Integration</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">80%</span></div><div class="strack"><div class="sbar" style="width:80%"></div></div></li>
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">Security Tooling</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">78%</span></div><div class="strack"><div class="sbar" style="width:78%"></div></div></li>
+          <li><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.88rem;color:var(--text-p)">Scripting & Automation</span><span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-m)">85%</span></div><div class="strack"><div class="sbar" style="width:85%"></div></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="bg-alt sp" style="border-top:1px solid var(--border-s)">
+  <div class="inner">
+    <div class="slabel reveal">// featured_work</div>
+    <h2 class="reveal d1 font-display" style="font-size:clamp(1.8rem,4vw,2.6rem);font-weight:300;color:var(--text-p);margin-bottom:3rem">Projects & Research</h2>
+    <div style="border:1px solid var(--border-s);border-radius:2px;overflow:hidden">
+
+      <div class="prow reveal" style="padding:2rem 2rem 2rem 2.5rem">
+        <div class="pacc"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:.75rem">
+              <span style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-m)">01</span>
+              <span class="tag">Security Infrastructure</span>
+            </div>
+            <h3 class="font-display" style="font-size:1.4rem;font-weight:400;color:var(--text-p);margin-bottom:.6rem">Implementasi SIEM</h3>
+            <p style="font-size:.88rem;line-height:1.75;color:var(--text-s);margin-bottom:1rem;max-width:600px">Membangun sistem SIEM dari nol menggunakan Wazuh sebagai agent-based detection dan Elasticsearch sebagai backend log skala besar. Mencakup konfigurasi alert rules, korelasi event, dan real-time monitoring dashboard.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:6px"><span class="tag">Wazuh</span><span class="tag">Elasticsearch</span><span class="tag">Kibana</span><span class="tag">Log Correlation</span></div>
+          </div>
+          <div class="parrow" style="display:none;align-self:center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="prow reveal d1" style="padding:2rem 2rem 2rem 2.5rem">
+        <div class="pacc"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:.75rem">
+              <span style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-m)">02</span>
+              <span class="tag">Threat Intelligence</span>
+            </div>
+            <h3 class="font-display" style="font-size:1.4rem;font-weight:400;color:var(--text-p);margin-bottom:.6rem">External Dynamic List (EDL)</h3>
+            <p style="font-size:.88rem;line-height:1.75;color:var(--text-s);margin-bottom:1rem;max-width:600px">Merancang dan mengembangkan sistem EDL otomatis untuk mengelola daftar IP dan URL berbahaya secara dinamis. Terintegrasi dengan firewall untuk pemblokiran real-time berdasarkan data threat intelligence terkini.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:6px"><span class="tag">Threat Intel</span><span class="tag">IP Blocklist</span><span class="tag">URL Filtering</span><span class="tag">Automation</span></div>
+          </div>
+          <div class="parrow" style="display:none;align-self:center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="prow reveal d2" style="padding:2rem 2rem 2rem 2.5rem">
+        <div class="pacc"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:.75rem">
+              <span style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-m)">03</span>
+              <span class="tag">Incident Response</span>
+            </div>
+            <h3 class="font-display" style="font-size:1.4rem;font-weight:400;color:var(--text-p);margin-bottom:.6rem">SOAR — Security Orchestration, Automation & Response</h3>
+            <p style="font-size:.88rem;line-height:1.75;color:var(--text-s);margin-bottom:1rem;max-width:600px">Membangun alur kerja SOAR untuk mengotomatiskan respons insiden keamanan yang terdeteksi SIEM. Mencakup triage otomatis, eskalasi notifikasi, dan eksekusi playbook remediasi.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:6px"><span class="tag">SOAR</span><span class="tag">Playbook</span><span class="tag">Orchestration</span><span class="tag">IR Automation</span></div>
+          </div>
+          <div class="parrow" style="display:none;align-self:center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications" class="bg-main sp" style="border-top:1px solid var(--border-s)">
+  <div class="inner">
+    <div class="slabel reveal">// credentials</div>
+    <h2 class="reveal d1 font-display" style="font-size:clamp(1.8rem,4vw,2.6rem);font-weight:300;color:var(--text-p);margin-bottom:3rem">Certifications</h2>
+    <div id="cert-grid" style="display:grid;grid-template-columns:1fr;gap:1rem">
+      <div class="ccard reveal">
+        <div class="cacc"></div>
+        <div style="width:44px;height:44px;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;border:1px solid var(--border-g);background:var(--stat-bg)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem">BNSP</div>
+        <h3 class="font-display" style="font-size:1.4rem;font-weight:400;color:var(--text-p);margin-bottom:.35rem">Junior Cyber Security</h3>
+        <p style="font-size:.82rem;color:var(--text-s)">Badan Nasional Sertifikasi Profesi · Keamanan Siber</p>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:1.25rem">
+          <div style="width:7px;height:7px;border-radius:50%;background:#22c55e"></div>
+          <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text-m)">Terverifikasi</span>
+        </div>
+      </div>
+      <div class="ccard reveal d1">
+        <div class="cacc"></div>
+        <div style="width:44px;height:44px;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;border:1px solid var(--border-g);background:var(--stat-bg)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem">BNSP</div>
+        <h3 class="font-display" style="font-size:1.4rem;font-weight:400;color:var(--text-p);margin-bottom:.35rem">Junior Developer Programmer</h3>
+        <p style="font-size:.82rem;color:var(--text-s)">Badan Nasional Sertifikasi Profesi · Pengembangan Perangkat Lunak</p>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:1.25rem">
+          <div style="width:7px;height:7px;border-radius:50%;background:#22c55e"></div>
+          <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text-m)">Terverifikasi</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="bg-alt hexbg sp" style="border-top:1px solid var(--border-s);text-align:center">
+  <div style="max-width:560px;margin:0 auto;padding:0 1.5rem">
+    <div class="slabel reveal" style="justify-content:center;display:flex">// contact</div>
+    <h2 class="reveal d1 font-display" style="font-size:clamp(1.8rem,4vw,2.6rem);font-weight:300;color:var(--text-p);margin-bottom:.75rem">Mari Berkolaborasi</h2>
+    <p class="reveal d2" style="font-size:.9rem;color:var(--text-s);margin-bottom:2.5rem;line-height:1.8">Terbuka untuk diskusi proyek, kolaborasi riset keamanan, atau berbagi wawasan seputar Blue Team operations dan pengembangan software.</p>
+    <div class="reveal d3" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px">
+      <a href="mailto:iqbal@email.com" class="btn-g">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </a>
+      <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="btn-o">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn-o">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-main" style="border-top:1px solid var(--border-s);padding:1.5rem">
+  <div class="inner" id="footer-inner" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center">
+    <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text-m)">© 2025 Muhammad Iqbal Alhamdani</span>
+    <span style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-m)">Blue Team Defender / Full-Stack Developer</span>
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script>
+/* Responsive layout helpers */
+function applyResponsive() {
+  const w = window.innerWidth;
+  const ag = document.getElementById('about-grid');
+  const sg = document.getElementById('skills-grid');
+  const cg = document.getElementById('cert-grid');
+  const fi = document.getElementById('footer-inner');
+  const arrows = document.querySelectorAll('.parrow');
+
+  if (ag) ag.style.gridTemplateColumns = w >= 768 ? '260px 1fr' : '1fr';
+  if (sg) sg.style.gridTemplateColumns = w >= 768 ? 'repeat(3,1fr)' : '1fr';
+  if (cg) cg.style.gridTemplateColumns = w >= 640 ? 'repeat(2,1fr)' : '1fr';
+  if (fi) {
+    fi.style.flexDirection = w >= 640 ? 'row' : 'column';
+    fi.style.justifyContent = w >= 640 ? 'space-between' : 'center';
+    fi.style.textAlign = w >= 640 ? 'left' : 'center';
+  }
+  arrows.forEach(a => { a.style.display = w >= 640 ? 'flex' : 'none'; });
+}
+applyResponsive();
+window.addEventListener('resize', applyResponsive);
+
+/* Loader */
+let loaderDone = false;
+function dismissLoader() {
+  if (loaderDone) return;
+  loaderDone = true;
+  document.getElementById('loader').classList.add('hide');
+  document.body.style.overflow = '';
+  setTimeout(() => { initReveal(); initCounters(); }, 80);
+}
+document.addEventListener('keydown', dismissLoader, { once: true });
+document.addEventListener('click', dismissLoader, { once: true });
+document.body.style.overflow = 'hidden';
+
+const loaderLines = [
+  { text:'$ ssh iqbal@portfolio.dev', cls:'gold', delay:0 },
+  { text:'Authenticating...', cls:'muted', delay:350 },
+  { text:'✓ Connection established', cls:'green', delay:750 },
+  { text:'$ wazuh-control status', cls:'gold', delay:1050 },
+  { text:'Wazuh Manager: running', cls:'', delay:1350 },
+  { text:'Elasticsearch: active', cls:'', delay:1550 },
+  { text:'SOAR engine: online', cls:'', delay:1750 },
+  { text:'$ load portfolio --user=iqbal', cls:'gold', delay:2000 },
+];
+const llEl = document.getElementById('ll');
+const lbwEl = document.getElementById('lbw');
+const lbEl = document.getElementById('lb');
+loaderLines.forEach(({ text, cls, delay }) => {
+  setTimeout(() => {
+    if (loaderDone) return;
+    const d = document.createElement('div');
+    d.className = 'll' + (cls ? ' '+cls : '');
+    d.textContent = text;
+    llEl.appendChild(d);
+  }, delay);
+});
+setTimeout(() => {
+  if (loaderDone) return;
+  lbwEl.style.display = 'block';
+  let w = 0;
+  const iv = setInterval(() => {
+    if (loaderDone) { clearInterval(iv); return; }
+    w = Math.min(w+3, 100);
+    lbEl.style.width = w+'%';
+    if (w >= 100) { clearInterval(iv); setTimeout(dismissLoader, 150); }
+  }, 18);
+}, 2200);
+setTimeout(dismissLoader, 6000);
+
+/* Scroll progress + active nav */
+window.addEventListener('scroll', () => {
+  const total = document.body.scrollHeight - window.innerHeight;
+  if (total > 0) document.getElementById('progress-bar').style.width = (window.scrollY/total*100)+'%';
+  const secs = document.querySelectorAll('section[id]');
+  let cur = '';
+  secs.forEach(s => { if (window.scrollY >= s.offsetTop - 100) cur = s.id; });
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+cur));
+});
+
+/* Reveal */
+function initReveal() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        e.target.querySelectorAll('.sbar').forEach(b => b.classList.add('animate'));
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  const bo = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('animate'); });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.sbar').forEach(b => bo.observe(b));
+}
+
+/* Counters */
+function initCounters() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !e.target.dataset.done) {
+        e.target.dataset.done = '1';
+        const target = parseInt(e.target.dataset.target);
+        const suffix = e.target.dataset.suffix || '';
+        let cur = 0;
+        const iv = setInterval(() => {
+          cur = Math.min(cur+1, target);
+          e.target.textContent = cur+suffix;
+          if (cur >= target) clearInterval(iv);
+        }, 60);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.counter').forEach(el => obs.observe(el));
+}
+
+/* Typewriter */
+const phrases = ['wazuh --monitor all-endpoints','elasticsearch --index security-logs','soar --run incident-playbook','edl --update threat-intel-feed'];
+let pi=0,ci=0,del=false;
+const typeEl = document.getElementById('typetext');
+function type() {
+  const p = phrases[pi];
+  if (!del) {
+    typeEl.textContent = p.slice(0,++ci);
+    if (ci===p.length){del=true;setTimeout(type,1800);return}
+  } else {
+    typeEl.textContent = p.slice(0,--ci);
+    if (ci===0){del=false;pi=(pi+1)%phrases.length}
+  }
+  setTimeout(type, del?38:72);
+}
+setTimeout(type, 500);
+
+/* Theme */
+function toggleTheme() {
+  const h = document.documentElement;
+  const d = h.classList.contains('dark');
+  h.classList.toggle('dark',!d);
+  h.classList.toggle('light',d);
+}
+
+/* Mobile menu */
+function toggleMenu() {
+  document.getElementById('mob-menu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const menu = document.getElementById('mob-menu');
+  const btn = document.getElementById('hbg');
+  if (menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+    menu.classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
